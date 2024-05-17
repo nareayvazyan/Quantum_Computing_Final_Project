@@ -59,13 +59,6 @@ The complexity of the move search depends on the number of possible sequences an
 The game can be described using a system of n qubits, where n is the number of digits in the sequence. Each qubit represents a binary digit (0 or 1) of a sequence. The game states are superpositions of all possible sequences, with each sequence having a corresponding amplitude. For example, for a sequence of 4 digits, the state vector would be a superposition of 
 2^4 = 16 basis states, each representing one of the possible sequences.
 
-4. Design quantum gates that implement the operations of the sequential classical algorithm:
 
-Quantum gates can be designed to perform operations such as comparing a guess with the secret sequence and providing a score. For example, a gate could be designed to compare two sequences and output the number of matching digits in their correct positions. Gates implementing classical logical operations like AND, XOR, and NOT can be used for this purpose.
-
-
-5. Apply the designed gates to superposition states aiming at parallelization of the move search:
-
-By applying the designed gates to superposition states, the move search can be parallelized, allowing multiple comparisons to be performed simultaneously. This can potentially speed up the search process compared to classical methods, where comparisons are performed sequentially. Quantum parallelism enables exploration of multiple sequences at once, leading to faster convergence to the correct sequence.
 
 
