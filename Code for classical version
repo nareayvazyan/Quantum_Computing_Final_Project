@@ -1,0 +1,64 @@
+
+import java.util.Random; // Import for generating random numbers
+import java.util.Scanner; // Import for user input
+
+public class SimpleMastermindBinary {
+
+    private final int bits; // Number of bits in the secret code
+    private String secretCode; // The actual secret code (generated randomly)
+
+    public SimpleMastermindBinary(int bits) {
+        this.bits = bits;
+        secretCode = generateRandomCode(bits); // Generate the secret code
+    }
+
+    private String generateRandomCode(int bits) {
+        StringBuilder sb = new StringBuilder(); // Used to build the code string
+        Random random = new Random(); // Object for random number generation
+        for (int i = 0; i < bits; i++) {
+            sb.append(random.nextInt(2)); // Append a random 0 or 1 to the code string
+        }
+        return sb.toString();
+    }
+
+    public void playGame() {
+        System.out.println("Welcome to Mastermind!");
+
+        for (int attempt = 1; ; attempt++) { // Loop continues indefinitely until the code is guessed
+            String guess = getGuess(); // Get the user's guess
+            int score = evaluateGuess(guess); // Evaluate the guess
+
+            System.out.printf("Try %d: Your Guess = %s - Score = %d\n", attempt, guess, score);
+
+            if (score == bits) {
+                System.out.println("Congratulations! You guessed the secret code.");
+                return;
+            }
+        }
+    }
+
+    private String getGuess() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter your guess (a binary string of length " + bits + "): ");
+        return scanner.nextLine();
+    }
+
+    private int evaluateGuess(String guess) {
+        int score = 0;
+        for (int i = 0; i < bits; i++) {
+            if (guess.charAt(i) == secretCode.charAt(i)) { // Check if corresponding bits match
+                score++;
+            }
+        }
+        return score;
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the number of bits for the secret code: ");
+        int bits = scanner.nextInt();
+
+        SimpleMastermindBinary game = new SimpleMastermindBinary(bits);
+        game.playGame();
+    }
+}
