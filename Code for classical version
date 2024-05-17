@@ -62,3 +62,5 @@ public class SimpleMastermindBinary {
         game.playGame();
     }
 }
+
+Console screenshots are in the file called ClassicalCodes. This version is a good "guessing" game. But it lacks quantum approach. Hence further I have uploaded solution with quantum teqnichues.
