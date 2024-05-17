@@ -1,0 +1,130 @@
+Master Mind
+Version 2: each guess is graded by the keeper with a single digit – the number of correct
+pins in their correct positions. The game stops when the grade of the most recent guess is
+n.
+
+Classical Approach Complexity:
+
+The worst-case complexity in classical computing is O(2^n), which is exponential.
+
+Quantum Approach Complexity:
+
+Quantum computing can have complexity of O((2^n)^(1/2)). 
+
+Considering a 4-Qubit System:
+
+Four qubits can represent all 4-bit possibilities:
+
+1/4 sum x=0 to 15 |x> (representing the superposition of all possible guesses)
+|x> - Basis states for each guess (0000...1111)
+|r> - Represents the unknown secret code
+k - Represents the exact number of matches
+
+Oracle Function (f(x,r,k)):
+
+This function outputs 1 if the Hamming Weight (number of 1s) of the XOR operation between |x> and |r> equals 4-k (meaning k matches), and 0 otherwise.
+Hamming Weight (x⊕r) - Counts the number of mismatches between the guess (x) and the secret code (r).
+4-k signifies that k qubits match between the guess and the code.
+
+Computing XOR with Ancillary Qubits:
+
+To compute the XOR of each qubit in |x> with the corresponding qubit in |r>, we can use ancillary qubits to store the results of correct matches.
+The U_xor gate can be applied with the following operation:
+U_xor |x_i>|r_i>|a_i> = |x_i>|r_i>|a_i> ⊕ (x_i ⊕ r_i)
+If r_i is 1, we apply X|x_i> followed by CNOT(|x_i>|a_i>) and then X|x_i> again.
+This setup ensures that |a_i> is |0> when there's a match and |1> when there isn't.
+Further Toffoli gates will be used 
+
+Counting Matches with Toffoli Gates:
+
+Toffoli gates (CCNOT) are used for counting matches.
+Inputs: |x>, |y> (control qubits), |z> (target qubit)
+Output: |z> is flipped only if both |x> and |y> are in the |1> state.
+By applying Toffoli gates strategically, we can flip the least significant bit (starting from the left) of the counter every time a match (0 from XOR) is found.
+
+To implement binary counting logic, Toffoli gates are used to flip the least significant bit (starting from left) of the counter every time a match (0 from XOR) is found.
+
+¼ sum x=0 to 15 |x>  when we apply our f(x,r)
+¼ ( (sum |x> f(x,r) =0 ) -  ( (sum |x> f(x,r) =1 )
+
+State Amplification (Optional):
+
+After applying f(x,r,k), we can perform state amplification to increase the probability of measuring the desired solution state.
+This might involve a carefully chosen unitary transformation (Us) with the following property: Us = 2|ψ⟩<ψ⟩ - I
+Here, |ψ⟩ represents the current superposition state, and I is the identity matrix.
+Subtracting the identity matrix (I) amplifies the difference between states with high and low probabilities of being the solution.
+
+When we apply Us we have the following result 
+2 * (¼ sum y=0 to 15 |y>) ¼ sum x=0 to 15 <x| ψ⟩ = 2/16 sum y=0 to 15 |y> (( (sum 1 f(x,r) =0 ) -  ( (sum 1 f(x,r) =1 ) = 1/8 sum y=0 to 15 (N0 – N1) 
+Where N0 is number of f(x,r) =0 and N1 is number of f(x,r) =1
+
+Substract I – identity matrix 
+
+1/8 (N0 – N1) sum x=0 to 15 |x> - 1/16 (( (sum |x> f(x,r) =0 ) -  ( (sum |x> f(x,r) =1 ) = 1/8 (N0 – N1) sum x=0 to 15 |x> - ¼ (sum |x> f(x,r) =0 + ¼ ( (sum |x> f(x,r) =1 )
+
+---------------------------------------------------------------------------------------
+Let's assume our kept number is 1001.
+
+The first guess is 0000.
+
+The keeper says that the score is 2, meaning 0000 compared with the kept number has 2 matches.
+
+Now, I will compare 0000 with other possible 4-byte numbers:
+
+Compare 0000 with 0000: score 4.
+Compare 0000 with 0001: score 3.
+Compare 0000 with 0010: score 3.
+Compare 0000 with 0011: score 2.
+Compare 0000 with 0100: score 3.
+Compare 0000 with 0101: score 2.
+Compare 0000 with 0110: score 2.
+Compare 0000 with 0111: score 1.
+Compare 0000 with 1000: score 3.
+Compare 0000 with 1001: score 2.
+Compare 0000 with 1010: score 2.
+Compare 0000 with 1011: score 1.
+Compare 0000 with 1100: score 2.
+Compare 0000 with 1101: score 1.
+Compare 0000 with 1110: score 1.
+Compare 0000 with 1111: score 0.
+
+In the classical approach, I would remove the ones that do not have score 2, because we know for sure, as the keeper claimed, that the kept number compared with 0000 equals a score of 2.
+
+But now, I am writing a quantum approach, so I will not remove non-2 scores.
+
+Instead, let's flip the ones that do not have score 2 and make them have score 2:
+
+Compare 0000 with 0000: score 4. Now, 0000 will become 1100, and 0000 compared with 1100 has a score of 2.
+Compare 0000 with 0001: score 3. Now, 0001 will become 1001, and 0000 compared with 1001 has a score of 2.
+Compare 0000 with 0010: score 3. Now, 0010 will become 1010, and 0000 compared with 1010 has a score of 2.
+Compare 0000 with 0011: score 2, so we will not change.
+Compare 0000 with 0100: score 3, so 0100 will become 1100, and 0000 compared with 1100 has a score of 2.
+Compare 0000 with 0101: score 2, so we will not change.
+Compare 0000 with 0110: score 2, so we will not change.
+Compare 0000 with 0111: score 1. Now, 0111 will become 0011, and 0000 compared with 0011 is a score of 2.
+Compare 0000 with 1000: score 3. Now, 1000 will become 1100, and 0000 compared with 1100 has a score of 2.
+Compare 0000 with 1001: score 2, so we will not change.
+Compare 0000 with 1010: score 2, so we will not change.
+Compare 0000 with 1011: score 1. 1011 will become 0011.
+Compare 0000 with 1100: score 2, so we will not change.
+Compare 0000 with 1101: score 1. 1101 will become 0101.
+Compare 0000 with 1110: score 1. 1110 will become 0110.
+Compare 0000 with 1111: score 0. Now, 1111 will become 0011, and 0000 compared with 0011 will have a score of 2.
+If we count, I have:
+
+4 times 0011,
+2 times 0101,
+2 times 0110,
+2 times 1001,
+2 times 1010,
+4 times 1100.
+So,
+
+4/16 probability for 0011,
+2/16 probability for 0101,
+2/16 probability for 0110,
+2/16 probability for 1001,
+2/16 probability for 1010,
+4/16 probability for 1100.
+
+By continuing possible variants will reduce and we will come to our kept  number. 
