@@ -3,46 +3,109 @@ Version 2: each guess is graded by the keeper with a single digit – the number
 pins in their correct positions. The game stops when the grade of the most recent guess is
 n.
 
+
 Classical Approach Complexity:
 
 The worst-case complexity in classical computing is O(2^n), which is exponential.
+Considering we have n positions and therefore 2^n possible sequences.
+We are going to play a binary version of Master Mind.
 
 Quantum Approach Complexity:
 
-Quantum computing can have complexity of O((2^n)^(1/2)). 
+Here we have N0 = 2^n
+N1 = n choose k = n! / k! (n-k)! = ( √(2πn) (n/e)^n ) / ( √(2πk) (k/e)^k √2π(n-k) ((n-k)/e)^(n-k) )
+k = n/2
+N1max =  ( √(2πn) (n/e)^n ) / ( 2π n/2 (n/2e)^n ) = √(2/π) (2^n) / √n 
+N0/N1 = √π/2 √n ~ √n 
+
+(Reference: 17.05.2024 session)
+
+We start with an initial state of |0>. We have H⊗4. All the possible states are superpositions.
+So we will have H⊗4 |0000> = 1/√16 sum x=0 to 15 |x>
 
 Considering a 4-Qubit System:
 
 Four qubits can represent all 4-bit possibilities:
 
-1/4 sum x=0 to 15 |x> (representing the superposition of all possible guesses)
+Below I've decribed a "guessing-flipping" process, but to avoid the long path we can have a function.
+
 |x> - Basis states for each guess (0000...1111)
 |r> - Represents the unknown secret code
 k - Represents the exact number of matches
 
-Oracle Function (f(x,r,k)):
+Function (f(x,r,k)):
 
-This function outputs 1 if the Hamming Weight (number of 1s) of the XOR operation between |x> and |r> equals 4-k (meaning k matches), and 0 otherwise.
-Hamming Weight (x⊕r) - Counts the number of mismatches between the guess (x) and the secret code (r).
-4-k signifies that k qubits match between the guess and the code.
+This function outputs 1 if the Hamming Weight between |x> and |r> equals N-k and 0 otherwise.
+Hamming Weight (x⊕r) - Counts the number of mismatches (1s) between (x) and  (r).
 
-Computing XOR with Ancillary Qubits:
+U|x> = (-1) ^ (f(x,r,k)) |x>
 
-To compute the XOR of each qubit in |x> with the corresponding qubit in |r>, we can use ancillary qubits to store the results of correct matches.
-The U_xor gate can be applied with the following operation:
-U_xor |x_i>|r_i>|a_i> = |x_i>|r_i>|a_i> ⊕ (x_i ⊕ r_i)
-If r_i is 1, we apply X|x_i> followed by CNOT(|x_i>|a_i>) and then X|x_i> again.
-This setup ensures that |a_i> is |0> when there's a match and |1> when there isn't.
-Further Toffoli gates will be used 
+Let's "run" the function:
 
+So the keeper keeps number (for example 1001). The guesser suggests 0000. The keeper says that there are 2 matches.
+We will now have
+Compare 0000 with 0000: score 4.
+Compare 0000 with 0001: score 3.
+Compare 0000 with 0010: score 3.
+Compare 0000 with 0011: score 2.
+Compare 0000 with 0100: score 3.
+Compare 0000 with 0101: score 2.
+Compare 0000 with 0110: score 2.
+Compare 0000 with 0111: score 1.
+Compare 0000 with 1000: score 3.
+Compare 0000 with 1001: score 2.
+Compare 0000 with 1010: score 2.
+Compare 0000 with 1011: score 1.
+Compare 0000 with 1100: score 2.
+Compare 0000 with 1101: score 1.
+Compare 0000 with 1110: score 1.
+Compare 0000 with 1111: score 0.
+
+Declare our (f(x,r,k)) function's given:
+x - 0001
+r - 0000
+k - 2
+x⊕r = f(0001, 0000, 2) = 2
+so we have 1, 4-1 = 3 ≠ 4-2 = 2 and 0, otherwise
+then we try 1110 0000 and her we have 1 which also is not equal to 2, so again the output is 0, by continuing we will get 
+
+Compare 0000 with 0000: score 0.
+Compare 0000 with 0001: score 0.
+Compare 0000 with 0010: score 0.
+Compare 0000 with 0011: score 1. (1)
+Compare 0000 with 0100: score 0.
+Compare 0000 with 0101: score 1. (2)
+Compare 0000 with 0110: score 1. (3)
+Compare 0000 with 0111: score 0.
+Compare 0000 with 1000: score 0.
+Compare 0000 with 1001: score 1. (4)
+Compare 0000 with 1010: score 1. (5)
+Compare 0000 with 1011: score 0.
+Compare 0000 with 1100: score 1. (6)
+Compare 0000 with 1101: score 0.
+Compare 0000 with 1110: score 0.
+Compare 0000 with 1111: score 0.
+
+Now we can conclude that the number of states that have the same score as the reference number is n choose k, where n is number of qubits and k is the number of mismatches
+in our case n = 4, k = 2, 4 choose 2 = 6
+As I counted above, indeed we had 6.
+
+H⊗4 |0000> = 1/√16 sum x=0 to 15 |x> -> 1/4 ( (sum |x> f(x,r, k) =0 ) -  ( (sum |x> f(x,r, k) =1 )
+
+By collapsing and calculating we will receive those 6 4qubit-անոց states. Then get a score, then continue until we get sufficient matches.
+Here we can recounter with deadlocks of getting the same match repeatedly.
+As we signed our mismatches to be 1s, in this case we can parallelly keep n superpositions and compare scores with xor's, and where the mismatches is 0 then it's our state. However, this method is not as reliable.
+Another strategy involves handling repeated scores by incorporating the previous score into a filtering function. This function ensures that the probability or amplitude of the exact score becomes 0, effectively eliminating it. By repeating this process, we eventually reach the desired number of matches.
+
+-----------------------------------------------------------------------------------------------
 Counting Matches with Toffoli Gates:
 
-Toffoli gates (CCNOT) are used for counting matches.
+Toffoli gates  are used for counting matches.
 Inputs: |x>, |y> (control qubits), |z> (target qubit)
 Output: |z> is flipped only if both |x> and |y> are in the |1> state.
 By applying Toffoli gates strategically, we can flip the least significant bit (starting from the left) of the counter every time a match (0 from XOR) is found.
 
-To implement binary counting logic, Toffoli gates are used to flip the least significant bit (starting from left) of the counter every time a match (0 from XOR) is found.
+To implement binary counting logic, Toffoli gates are used to flip the least significant bit (starting from left) of the counter every time a match  is found.
 
 ¼ sum x=0 to 15 |x>  when we apply our f(x,r)
 ¼ ( (sum |x> f(x,r) =0 ) -  ( (sum |x> f(x,r) =1 )
@@ -62,7 +125,9 @@ Substract I – identity matrix
 
 1/8 (N0 – N1) sum x=0 to 15 |x> - 1/16 (( (sum |x> f(x,r) =0 ) -  ( (sum |x> f(x,r) =1 ) = 1/8 (N0 – N1) sum x=0 to 15 |x> - ¼ (sum |x> f(x,r) =0 + ¼ ( (sum |x> f(x,r) =1 )
 
----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------
+Example using flipping.
+
 Let's assume our kept number is 1001.
 
 The first guess is 0000.
