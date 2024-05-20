@@ -110,20 +110,6 @@ To implement binary counting logic, Toffoli gates are used to flip the least sig
 ¼ sum x=0 to 15 |x>  when we apply our f(x,r)
 ¼ ( (sum |x> f(x,r) =0 ) -  ( (sum |x> f(x,r) =1 )
 
-State Amplification (Optional):
-
-After applying f(x,r,k), we can perform state amplification to increase the probability of measuring the desired solution state.
-This might involve a carefully chosen unitary transformation (Us) with the following property: Us = 2|ψ⟩<ψ⟩ - I
-Here, |ψ⟩ represents the current superposition state, and I is the identity matrix.
-Subtracting the identity matrix (I) amplifies the difference between states with high and low probabilities of being the solution.
-
-When we apply Us we have the following result 
-2 * (¼ sum y=0 to 15 |y>) ¼ sum x=0 to 15 <x| ψ⟩ = 2/16 sum y=0 to 15 |y> (( (sum 1 f(x,r) =0 ) -  ( (sum 1 f(x,r) =1 ) = 1/8 sum y=0 to 15 (N0 – N1) 
-Where N0 is number of f(x,r) =0 and N1 is number of f(x,r) =1
-
-Substract I – identity matrix 
-
-1/8 (N0 – N1) sum x=0 to 15 |x> - 1/16 (( (sum |x> f(x,r) =0 ) -  ( (sum |x> f(x,r) =1 ) = 1/8 (N0 – N1) sum x=0 to 15 |x> - ¼ (sum |x> f(x,r) =0 + ¼ ( (sum |x> f(x,r) =1 )
 
 -----------------------------------------------------------------------------------------------
 Example using flipping.
